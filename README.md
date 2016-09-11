@@ -2,18 +2,19 @@
 
 ## Overview
 
-This project implements a sentiment analyzer Storm topology for Reddit comments. It demonstrates how Storm can be used
-for realtime mining of high velocity data streams.
+This project implements a sentiment analyzer [Storm](http://storm.apache.org/) topology for Reddit comments. 
+
+It demonstrates how Storm can be used for realtime mining and aggregation of high velocity data streams.
 
 Given a list of [subreddits](https://www.reddit.com/reddits/), the topology polls the RSS feeds of each subreddit
-every 30 secs, updates comment counts and calculates sentiment scores for comments, and publishes the results to
+every 30 secs, updates comment counts, calculates sentiment scores for comments, and publishes the results to
 the cluster's associated Zookeeper server/cluster at the znode path "/reddit". 
 
-The _Viewer App_ subscribes to the same Zookeeper server/cluster, monitors changes to "/reddit", and displays the results
+A _Viewer App_ subscribes to the same Zookeeper server/cluster, monitors changes to "/reddit", and displays the results
 whenever they change. 
 
 
-** Sentiment Calculation: **
+**Sentiment Calculation**
   
 The sentiment score calculation is a very naive one - simply sum up 
 [AFINN](http://www2.imm.dtu.dk/pubdb/views/publication_details.php?id=6010) scores 
@@ -22,14 +23,14 @@ of all words in each comment.
 There is no machine learning or statistical model implemented here, but implementing one should 
 be fairly straightforward using Trident ML. 
 
-See [SentimentCalculatorBolt](../blob/master/src/main/java/storm/redditsentiment/SentimentCalculatorBolt.java) for 
+See [SentimentCalculatorBolt](../master/src/main/java/storm/redditsentiment/SentimentCalculatorBolt.java) for 
 calculation implementation.
 
 
 
 ## Usage
 
-### Deploy the topology to a Storm cluster
+### 1. Deploy the topology to a Storm cluster
 
 - Download `redditsentiment-cluster-all.jar` to any node of the Storm cluster.
 
@@ -57,7 +58,7 @@ calculation implementation.
     
 	```
 	
-### View Results 
+### 2. View Results 
 
 The topology publishes 3 lists:
 
@@ -67,9 +68,10 @@ The topology publishes 3 lists:
 
 - Top 5 stories with most negative comments across all given subreddits
 
-Run the _Viewer App_ to monitor these lists in realtime:
 
-- Download `redditsentiment-viewer.jar` to a machine which can access the Zookeeper server/cluster.
+Run the _Viewer App_ to display these lists in realtime:
+
++ Download `redditsentiment-viewer.jar` to a machine which can access the Zookeeper server/cluster.
 
 	```bash
 	
@@ -77,28 +79,34 @@ Run the _Viewer App_ to monitor these lists in realtime:
     
 	```
 	
-- Find out the IP address and port of Zookeeper server or any node of the Zookeeper cluster.
++ Find out the IP address and port of Zookeeper server or any node of the Zookeeper cluster.
   Examine the Storm cluster's `conf/storm.yaml` for these settings. 
   The Zookeeper port is usually 2181 for a standalone Zookeeper node, or 2000 for Storm's embedded Zookeeper node 
   when running in local mode.
   
-- Run the _Viewer App_:
++ Run the _Viewer App_:
 	
 	```bash
 	
     $ java -jar redditsentiment-viewer.jar [IP-ADDRESS-OF-ZOOKEEPER-NODE] [PORT-OF-ZOOKEEPER-DAEMON]
     
 	```
-	
 
-### Test the topology on a local Storm cluster
+**Viewer screenshot**
+![Viewer screenshot](screenshot.png)
+
+### 3. Test the topology on a local Storm cluster
 
 It's possible to test the topology in Storm's local cluster mode on a development machine.
 
 - Download `redditsentiment-local-all.jar` to development machine.
 
+	```bash
+	
     $ wget https://github.com/pathbreak/reddit-sentiment-storm/releases/download/release-1.0.0/redditsentiment-local-all.jar
     
+	```
+	
     
 - Start the local Storm harness and topology using this command line:
 
@@ -107,7 +115,7 @@ It's possible to test the topology in Storm's local cluster mode on a developmen
     $ java -jar redditsentiment-local-all.jar LOCAL <subreddit-1> <subreddit-2> ...
     
 	```
-- Run the _Viewer App_ as described in [View Results](View Results), giving `localhost` and `2000` as Zookeeper host and port.
+- Run the _Viewer App_ as described in [View Results](2. View Results), giving `localhost` and `2000` as Zookeeper host and port.
  
 
 
@@ -123,8 +131,15 @@ It's possible to test the topology in Storm's local cluster mode on a developmen
 	$ cd reddit-sentiment-storm
 	``` 
 
-+ `reddit-sentiment-storm$ mvn clean package`
-	
++ Run Maven compilation and packaging tasks:
+
+	```bash
+
+	reddit-sentiment-storm$ mvn clean package`
+
+	```
+
+
 + 3 JARs are produced under `reddit-sentiment-storm/dist` directory:
 
    + **redditsentiment-cluster-all.jar**
