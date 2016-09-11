@@ -1,0 +1,28 @@
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+
+	<!-- Based on http://maven.apache.org/plugins/maven-assembly-plugin/descriptor-refs.html#jar-with-dependencies -->
+	
+	<id>all</id>
+	
+	<formats>
+		<format>jar</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<dependencySets>
+		<dependencySet>
+			<!-- unpack should be true, otherwise JARs are included as JAR files instead of their class files. -->
+			<unpack>true</unpack>
+			
+			<!-- Set transitive filtering to true so any dependencies of excluded storm-core.jar
+			are also excluded.
+			-->
+			<useTransitiveFiltering>true</useTransitiveFiltering>
+			<excludes>
+				<exclude>org.apache.storm:storm-core</exclude>
+			</excludes>
+		</dependencySet>
+	</dependencySets>
+</assembly>

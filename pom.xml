@@ -1,0 +1,205 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.pathbreak.storm</groupId>
+	<artifactId>redditsentiment</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>redditsentiment</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<jdk.version>1.7</jdk.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.storm</groupId>
+			<artifactId>storm-core</artifactId>
+			<version>0.9.5</version>
+			<!-- Should be set to 'provided' to avoid packaging it during assembly. Including it
+			causes problems for Storm while submitting because Storm finds multiple default.yaml files, one
+			its own and another in the application JAR.  
+			-->
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.rometools</groupId>
+			<artifactId>rome</artifactId>
+			<version>1.7.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.9.2</version>
+		</dependency>
+
+		<!-- <dependency> <groupId>org.apache.zookeeper</groupId> <artifactId>zookeeper</artifactId> 
+			<version>3.4.6</version> </dependency> -->
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<!-- Set to Java7 since we want same JAR to work on both OpenJDK7 and OpenJDK8 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+				</configuration>
+			</plugin>
+
+			<!-- Maven Assembly Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4.1</version>
+				
+				<executions>
+					
+					<!-- Topology JAR that can be deployed on Storm cluster.
+					Does not package Storm or its dependencies because those are
+					provided by Storm at runtime.  
+					-->
+					<execution>
+						<id>make-cluster-assembly</id>
+						<!-- bind to the packaging phase -->
+						<phase>package</phase>
+
+						<configuration>
+							<!-- Since storm-core.jar should NOT be included in the fat jar,
+							create a custom assembly similar to jar-with-dependencies aseembly
+							to exclude it.
+							--> 
+							<descriptors>
+								<descriptor>assembly.xml</descriptor>
+							</descriptors>
+							
+							<finalName>redditsentiment-cluster</finalName>
+							<appendAssemblyId>true</appendAssemblyId>
+							<outputDirectory>${basedir}/dist</outputDirectory>
+							
+						</configuration>
+
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+
+
+
+
+
+					<!-- Topology JAR for running topology in local cluster mode.
+					Contains all dependencies, including Storm itself.
+					-->  
+
+					<execution>
+						<id>make-local-assembly</id>
+						<!-- bind to the packaging phase -->
+						<phase>package</phase>
+
+						<configuration>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							
+							<archive>
+								<manifest>
+									<mainClass>storm.redditsentiment.RedditSentimentTopology</mainClass>
+								</manifest>
+							</archive>
+							
+							<finalName>redditsentiment-local-all</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+							<outputDirectory>${basedir}/dist</outputDirectory>
+							
+							<!--
+							'attach' set to false to avoid these incomprehensible maven warnings:
+							 
+							[WARNING] Configuration options: 'appendAssemblyId' is set to false, and 'classifier' 
+							is missing. Instead of attaching the assembly file: redditsentiment-viewer.jar, it will become the file for main project artifact.
+							NOTE: If multiple descriptors or descriptor-formats are provided for this project, the value of this file will be non-deterministic!
+							
+							[WARNING] Replacing pre-existing project main-artifact file: redditsentiment-0.0.1-SNAPSHOT.jar
+							 -->
+							
+							<attach>false</attach>
+							
+						</configuration>
+
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+
+
+
+
+
+
+
+
+					<!-- Viewer app JAR for viewing results of the processing.
+					Contains all dependencies, including Storm (for Config constants) and Storm's shaded
+					version of Zookeeper.
+					-->  
+
+					<execution>
+						<id>make-viewer-assembly</id>
+						<!-- bind to the packaging phase -->
+						<phase>package</phase>
+
+						<configuration>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							
+							<archive>
+								<manifest>
+									<mainClass>storm.redditsentiment.ViewerApp</mainClass>
+								</manifest>
+							</archive>
+							
+							<finalName>redditsentiment-viewer</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+							
+							<!--
+							'attach' set to false to avoid these incomprehensible maven warnings:
+							 
+							[WARNING] Configuration options: 'appendAssemblyId' is set to false, and 'classifier' 
+							is missing. Instead of attaching the assembly file: redditsentiment-viewer.jar, it will become the file for main project artifact.
+							NOTE: If multiple descriptors or descriptor-formats are provided for this project, the value of this file will be non-deterministic!
+							
+							[WARNING] Replacing pre-existing project main-artifact file: redditsentiment-0.0.1-SNAPSHOT.jar
+							 -->
+							
+							<attach>false</attach>
+							<outputDirectory>${basedir}/dist</outputDirectory>
+							
+						</configuration>
+
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
