@@ -71,6 +71,11 @@ The topology publishes 3 lists:
 
 Run the _Viewer App_ to display these lists in realtime:
 
++ System Requirements:
+
+	- One of OpenJDK or Oracle's JRE7 or JRE8 should be installed 
+	
+
 + Download `redditsentiment-viewer.jar` to a machine which can access the Zookeeper server/cluster.
 
 	```bash
@@ -102,6 +107,11 @@ Run the _Viewer App_ to display these lists in realtime:
 
 It's possible to test the topology in Storm's local cluster mode on a development machine.
 
+- System Requirements:
+
+	+ One of OpenJDK or Oracle's JRE7 or JRE8 should be installed 
+	
+
 - Download `redditsentiment-local-all.jar` to development machine.
 
 	```bash
@@ -123,6 +133,11 @@ It's possible to test the topology in Storm's local cluster mode on a developmen
 
 
 ## Build
+
++ System Requirements:
+
+	- One of OpenJDK or Oracle's JRE7 or JRE8 should be installed 
+	
 
 + Install Apache Maven2/3
 
