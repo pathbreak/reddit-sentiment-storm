@@ -93,7 +93,10 @@ Run the _Viewer App_ to display these lists in realtime:
 	```
 
 **Viewer screenshot**
+
 ![Viewer screenshot](screenshot.png)
+
+
 
 ### 3. Test the topology on a local Storm cluster
 
@@ -115,7 +118,7 @@ It's possible to test the topology in Storm's local cluster mode on a developmen
     $ java -jar redditsentiment-local-all.jar LOCAL <subreddit-1> <subreddit-2> ...
     
 	```
-- Run the _Viewer App_ as described in [View Results](2. View Results), giving `localhost` and `2000` as Zookeeper host and port.
+- Run the _Viewer App_ as described in [View Results](2-view-results), giving `localhost` and `2000` as Zookeeper host and port.
  
 
 
@@ -148,11 +151,11 @@ It's possible to test the topology in Storm's local cluster mode on a developmen
 
    + **redditsentiment-local-all.jar**
      
-     This JAR is for testing the topology in a standalone Storm harness on your development machine. See [Usage](Usage).  
+     This JAR is for testing the topology in a standalone Storm harness on your development machine. See [Test topology on local storm cluster](3-test-the-topology-on-a-local-storm-cluster).  
 
    + **redditsentiment-viewer.jar**
      
-     This is the Viewer console app JAR to display results of the analysis.  See [Usage](Usage).
+     This is the Viewer console app JAR to display results of the analysis.  See [View Results](2-view-results).
 
 
 
@@ -160,7 +163,7 @@ It's possible to test the topology in Storm's local cluster mode on a developmen
 
 ## Credits
 
-- This project uses the AFINN database for word sentiment scores. See Citation below. 
+- This project uses the AFINN database for word sentiment scores. See [Citation](citation) below. 
 
 
 
